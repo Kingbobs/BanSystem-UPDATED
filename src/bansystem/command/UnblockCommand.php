@@ -30,7 +30,6 @@ class UnblockCommand extends Command {
             }
             $blockList->remove($args[0]);
             $sender->getServer()->broadcastMessage(TextFormat::AQUA . $args[0] . TextFormat::GREEN . " has been unblocked.");
-        } else {
             
         }
     }
