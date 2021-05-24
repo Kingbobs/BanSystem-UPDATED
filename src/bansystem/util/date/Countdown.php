@@ -236,7 +236,7 @@ class Countdown {
             $day--;
         }
         if ($day <= -1) {
-            $day = 30 + $day;
+            $day = intval($to->format("t")) + $day;
             $month--;
         }
         if ($month <= -1) {
