@@ -36,23 +36,23 @@ use pocketmine\plugin\PluginBase;
 
 class BanSystem extends PluginBase {
     
-    private function removeCommand(string $command) {
+    private function removeCommand(string $command): void {
         $commandMap = $this->getServer()->getCommandMap();
         $cmd = $commandMap->getCommand($command);
-        if ($cmd == null) {
+        if ($cmd === null) {
             return;
         }
         $cmd->setLabel("");
-        $cmd->unregister($commandMap);
+        $commandMap->unregister($cmd);
     }
     
-    private function initializeCommands() {
-        $commands = array("ban", "banlist", "pardon", "pardon-ip", "ban-ip", "kick");
-        for ($i = 0; $i < count($commands); $i++) {
-            $this->removeCommand($commands[$i]);
+    private function initializeCommands(): void {
+        $commands = ["ban", "banlist", "pardon", "pardon-ip", "ban-ip", "kick"];
+        foreach ($commands as $command) {
+            $this->removeCommand($command);
         }
         $commandMap = $this->getServer()->getCommandMap();
-        $commandMap->registerAll("bansystem", array(
+        $commandMap->registerAll("bansystem", [
             new BanCommand(),
             new BanIPCommand(),
             new BanListCommand(),
@@ -77,13 +77,13 @@ class BanSystem extends PluginBase {
             new UnblockIPCommand(),
             new UnmuteCommand(),
             new UnmuteIPCommand()
-        ));
+        ]);
     }
     
     /**
      * @param Permission[] $permissions
      */
-    protected function addPermissions(array $permissions) {
+    protected function addPermissions(array $permissions): void {
         foreach ($permissions as $permission) {
             $this->getServer()->getPluginManager()->addPermission($permission);
         }
@@ -94,60 +94,60 @@ class BanSystem extends PluginBase {
      * @param Plugin $plugin
      * @param Listener[] $listeners
      */
-    protected function registerListeners(Plugin $plugin, array $listeners) {
+    protected function registerListeners(Plugin $plugin, array $listeners): void {
         foreach ($listeners as $listener) {
             $this->getServer()->getPluginManager()->registerEvents($listener, $plugin);
         }
     }
     
-    private function initializeListeners() {
-        $this->registerListeners($this, array(
+    private function initializeListeners(): void {
+        $this->registerListeners($this, [
             new PlayerChatListener(),
             new PlayerCommandPreproccessListener(),
             new PlayerPreLoginListener()
-        ));
+        ]);
     }
     
-    private function initializeFiles() {
+    private function initializeFiles(): void {
         @mkdir($this->getDataFolder());
-        if (!(file_exists("muted-players.txt") && is_file("muted-players.txt"))) {
-            @fopen("muted-players.txt", "w+");
+        if (!file_exists($this->getDataFolder() . "muted-players.txt")) {
+            @touch($this->getDataFolder() . "muted-players.txt");
         }
-        if (!(file_exists("muted-ips.txt") && is_file("muted-ips.txt"))) {
-            @fopen("muted-ips.txt", "w+");
+        if (!file_exists($this->getDataFolder() . "muted-ips.txt")) {
+            @touch($this->getDataFolder() . "muted-ips.txt");
         }
-        if (!(file_exists("blocked-players.txt") && is_file("blocked-players.txt"))) {
-            @fopen("blocked-players.txt", "w+");
+        if (!file_exists($this->getDataFolder() . "blocked-players.txt")) {
+            @touch($this->getDataFolder() . "blocked-players.txt");
         }
-        if (!(file_exists("blocked-ips.txt") && is_file("blocked-ips.txt"))) {
-            @fopen("blocked-ips.txt", "w+");
+        if (!file_exists($this->getDataFolder() . "blocked-ips.txt")) {
+            @touch($this->getDataFolder() . "blocked-ips.txt");
         }
     }
     
-    private function initializePermissions() {
-        $this->addPermissions(array(
-            new Permission("bansystem.command.ban", "Allows the player to prevent the given player to use this server.", Permission::DEFAULT_OP),
-            new Permission("bansystem.command.banip", "Allows the player to prevent the given IP address to use this server.", Permission::DEFAULT_OP),
+    private function initializePermissions(): void {
+        $this->addPermissions([
+            new Permission("bansystem.command.ban", "Allows the player to prevent the given player from using this server.", Permission::DEFAULT_OP),
+            new Permission("bansystem.command.banip", "Allows the player to prevent the given IP address from using this server.", Permission::DEFAULT_OP),
             new Permission("bansystem.command.banlist", "Allows the player to view the players/IP addresses banned on this server.", Permission::DEFAULT_OP),
             new Permission("bansystem.command.blocklist", "Allows the player to view all the players/IP addresses banned from this server."),
             new Permission("bansystem.command.kick", "Allows the player to remove the given player.", Permission::DEFAULT_OP),
-            new Permission("bansystem.command.mute", "Allows the player to prevent the given player from sending public chat message.", Permission::DEFAULT_OP),
-            new Permission("bansystem.command.muteip", "Allows the player to prevent the given IP address from sending public chat message.", Permission::DEFAULT_OP),
-            new Permission("bansystem.command.mutelist", "Allows the player to view all the players muted from this server.", Permission::DEFAULT_OP),
+            new Permission("bansystem.command.mute", "Allows the player to prevent the given player from sending public chat messages.", Permission::DEFAULT_OP),
+            new Permission("bansystem.command.muteip", "Allows the player to prevent the given IP address from sending public chat messages.", Permission::DEFAULT_OP),
+            new Permission("bansystem.command.mutelist", "Allows the player to view all the players muted on this server.", Permission::DEFAULT_OP),
             new Permission("bansystem.command.pardon", "Allows the player to allow the given player to use this server.", Permission::DEFAULT_OP),
             new Permission("bansystem.command.pardonip", "Allows the player to allow the given IP address to use this server.", Permission::DEFAULT_OP),
-            new Permission("bansystem.command.tban", "Allows the player to temporarily prevent the given player to use this server.", Permission::DEFAULT_OP),
-            new Permission("bansystem.command.tbanip", "Allows the player to temporarily prevent the given IP address to use this server.", Permission::DEFAULT_OP),
-            new Permission("bansystem.command.tmute", "Allows the player to temporarily prevents the given player to send public chat message.", Permission::DEFAULT_OP),
-            new Permission("bansystem.command.tmuteip", "Allows the player to prevents the given IP address to send public chat message.", Permission::DEFAULT_OP),
+            new Permission("bansystem.command.tban", "Allows the player to temporarily prevent the given player from using this server.", Permission::DEFAULT_OP),
+            new Permission("bansystem.command.tbanip", "Allows the player to temporarily prevent the given IP address from using this server.", Permission::DEFAULT_OP),
+            new Permission("bansystem.command.tmute", "Allows the player to temporarily prevent the given player from sending public chat messages.", Permission::DEFAULT_OP),
+            new Permission("bansystem.command.tmuteip", "Allows the player to temporarily prevent the given IP address from sending public chat messages.", Permission::DEFAULT_OP),
             new Permission("bansystem.command.unban", "Allows the player to allow the given player to use this server.", Permission::DEFAULT_OP),
             new Permission("bansystem.command.unbanip", "Allows the player to allow the given IP address to use this server.", Permission::DEFAULT_OP),
-            new Permission("bansystem.command.unmute", "Allows the player to allow the given player to send public chat message.", Permission::DEFAULT_OP),
-            new Permission("bansystem.command.unmuteip", "Allows the player to allow the given IP address to send public chat message.")
-        ));
+            new Permission("bansystem.command.unmute", "Allows the player to allow the given player to send public chat messages.", Permission::DEFAULT_OP),
+            new Permission("bansystem.command.unmuteip", "Allows the player to allow the given IP address to send public chat messages.")
+        ]);
     }
     
-    private function removeBanExpired() {
+    private function removeBanExpired(): void {
         $this->getServer()->getNameBans()->removeExpired();
         $this->getServer()->getIPBans()->removeExpired();
         Manager::getNameMutes()->removeExpired();
@@ -156,12 +156,12 @@ class BanSystem extends PluginBase {
         Manager::getIPBlocks()->removeExpired();
     }
     
-    public function onLoad() {
+    public function onLoad(): void {
         $this->getLogger()->info("VMPE-Action is now loading... Please wait for completion.");
     }
     
-    public function onEnable() {
-        $this->getLogger()->info("VMPE-Action is now enabled. As far as we know, there's no errors on-enable.");
+    public function onEnable(): void {
+        $this->getLogger()->info("VMPE-Action is now enabled. As far as we know, there are no errors on enable.");
         $this->initializeCommands();
         $this->initializeListeners();
         $this->initializePermissions();
@@ -169,7 +169,7 @@ class BanSystem extends PluginBase {
         $this->removeBanExpired();
     }
     
-    public function onDisable() {
+    public function onDisable(): void {
         $this->getLogger()->info("VMPE-Action is now disabled. Did the server stop?");
     }
 }
